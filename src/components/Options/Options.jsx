@@ -1,20 +1,33 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Feedback from "../Feedback/Feedback";
+import Notification from "../Notifications/Notification";
 
-export default function Options() {
-  const [goodCount, setGoodCount] = useState(0);
-  const [neutralCount, setNeutralCount] = useState(0);
-  const [badCount, setBadCount] = useState(0);
+export default function Options({ handleReset }) {
+  const [feedbackCounts, setFeedbackCounts] = useState({
+    goodCount: 0,
+    neutralCount: 0,
+    badCount: 0,
+  });
+
+  useEffect(() => {
+    // Зчитування з localStorage при ініціалізації
+    const savedCounts = JSON.parse(localStorage.getItem("feedbackCounts"));
+    if (savedCounts) {
+      setFeedbackCounts(savedCounts);
+    }
+  }, []);
 
   const handleClicke = (type) => {
-    if (type === "good") {
-      setGoodCount(goodCount + 1);
-    } else if (type === "neutral") {
-      setNeutralCount(neutralCount + 1);
-    } else if (type === "bad") {
-      setBadCount(badCount + 1);
-    }
+    setFeedbackCounts((prevCounts) => ({
+      ...prevCounts,
+      [`${type}Count`]: prevCounts[`${type}Count`] + 1,
+    }));
   };
+
+  useEffect(() => {
+    // Збереження в localStorage при зміні стану
+    localStorage.setItem("feedbackCounts", JSON.stringify(feedbackCounts));
+  }, [feedbackCounts]);
 
   return (
     <div>
@@ -29,23 +42,21 @@ export default function Options() {
           <button onClick={() => handleClicke("bad")}>Bad</button>
         </li>
         <li>
-          <button
-            onClick={() => {
-              localStorage.removeItem("goodCount");
-              localStorage.removeItem("neutralCount");
-              localStorage.removeItem("badCount");
-              window.location.reload();
-            }}
-          >
-            Сброс статистики
-          </button>
+          <button onClick={handleReset}>Сброс статистики</button>
         </li>
       </ul>
-      <Feedback
-        goodCount={goodCount}
-        neutralCount={neutralCount}
-        badCount={badCount}
-      />
+      {feedbackCounts.goodCount +
+        feedbackCounts.neutralCount +
+        feedbackCounts.badCount ===
+      0 ? (
+        <Notification />
+      ) : (
+        <Feedback
+          goodCount={feedbackCounts.goodCount}
+          neutralCount={feedbackCounts.neutralCount}
+          badCount={feedbackCounts.badCount}
+        />
+      )}
     </div>
   );
 }

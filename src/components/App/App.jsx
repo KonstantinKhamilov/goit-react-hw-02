@@ -1,6 +1,6 @@
 import description from "../../description.json";
 import Description from "../Description/Description.jsx";
-import Options from "../Options/Options.jsx";
+import Options from "../Options/options.jsx";
 
 const App = () => {
   return (
