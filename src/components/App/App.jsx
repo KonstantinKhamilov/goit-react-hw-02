@@ -20,6 +20,11 @@ const App = () => {
     }
   }, []);
 
+  useEffect(() => {
+    // Сохранение данных в localStorage при изменении состояния
+    localStorage.setItem("feedbackCounts", JSON.stringify(feedbackCounts));
+  }, [feedbackCounts]);
+
   // Функция для обновления количества отзывов
   const updateFeedbackCount = (type) => {
     setFeedbackCounts((prevCounts) => ({
@@ -28,11 +33,13 @@ const App = () => {
     }));
   };
 
-  // Расчет процента положительных отзывов
+  // Расчет общего количества кликов
   const totalClicks =
     feedbackCounts.goodCount +
     feedbackCounts.neutralCount +
     feedbackCounts.badCount;
+
+  // Расчет процента положительных отзывов
   const goodPercentage =
     totalClicks === 0
       ? 0
@@ -65,6 +72,7 @@ const App = () => {
           goodCount={feedbackCounts.goodCount}
           neutralCount={feedbackCounts.neutralCount}
           badCount={feedbackCounts.badCount}
+          totalClicks={totalClicks}
           goodPercentage={goodPercentage}
         />
       ) : (
